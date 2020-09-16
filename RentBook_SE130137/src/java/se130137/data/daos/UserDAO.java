@@ -28,8 +28,8 @@ public class UserDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sql = "SELECT fullName, roleID, isActive FROM tblUser WHERE "
-                        + "userID=? AND password=?";
+                String sql = "SELECT fullName, roleID, isActive FROM tblUser "
+                        + "WHERE userID=? AND password=?";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, userID);
                 stm.setString(2, password);
@@ -37,8 +37,9 @@ public class UserDAO {
                 if (rs.next()) {
                     String fullName = rs.getString("fullName");
                     String roleID = rs.getString("roleID");
-                    String isActive = rs.getString("isActive");
+                    boolean isActive = rs.getBoolean("isActive");
 
+                    result.setUserID(userID);
                     result.setFullName(fullName);
                     result.setRoleID(roleID);
                     result.setIsActive(isActive);
@@ -79,7 +80,7 @@ public class UserDAO {
                     String fullName = rs.getString("fullName");
                     String password = "***";
                     String roleID = rs.getString("roleID");
-                    String isActive = rs.getString("isActive");
+                    boolean isActive = rs.getBoolean("isActive");
                     list.add(new UserDTO(userID, fullName, password, roleID, isActive));
                 }
             }
@@ -99,7 +100,6 @@ public class UserDAO {
     }
 
     public void ban(String userID) throws SQLException {
-        List<UserDTO> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stm = null;
         try {
@@ -109,7 +109,7 @@ public class UserDAO {
                         + "isActive=?"
                         + " WHERE userID=?"; //if search = "" -> show all list in database
                 stm = conn.prepareStatement(sql);
-                stm.setString(1, "false");
+                stm.setBoolean(1, false);
                 stm.setString(2, userID);
                 stm.executeUpdate();
             }
@@ -196,7 +196,7 @@ public class UserDAO {
                 stm.setString(2, dto.getPassword());
                 stm.setString(3, dto.getFullName());
                 stm.setString(4, dto.getRoleID());
-                stm.setString(5, dto.getIsActive());
+                stm.setBoolean(5, dto.isIsActive());
                 stm.executeUpdate();
             }
         } catch (Exception e) {

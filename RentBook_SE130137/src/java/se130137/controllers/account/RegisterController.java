@@ -44,7 +44,7 @@ public class RegisterController extends HttpServlet {
             String roleID = "2";
             String password = request.getParameter("txtPassword");
             String rePassword = request.getParameter("txtRePassword");
-            String active = "1";
+            boolean isActive = true;
             boolean check = true;
 
             UserErrorDTO errorDTO = new UserErrorDTO();
@@ -52,8 +52,8 @@ public class RegisterController extends HttpServlet {
                 errorDTO.setUserIDError("UserID is not empty");
                 check = false;
             }
-            if (fullName.isEmpty() || fullName.length() < 2 || fullName.length() > 8) {
-                errorDTO.setFullNameError("2 < FullName < 8");
+            if (fullName.isEmpty() || fullName.length() < 2 || fullName.length() > 16) {
+                errorDTO.setFullNameError("2 < FullName < 16");
                 check = false;
             }
             if (!password.equals(rePassword)) {
@@ -68,13 +68,16 @@ public class RegisterController extends HttpServlet {
             }
             
             if (check) {
-                UserDTO dto = new UserDTO(userID, fullName, password, roleID, active);
+                UserDTO dto = new UserDTO(userID, fullName, password, roleID, isActive);
                 dao.insert(dto);
                 url = SUCCESS;
+                
+                request.setAttribute("message", "Register Success!");
             } else {
                 request.setAttribute("ERROR", errorDTO);
             }
         } catch (Exception e) {
+            log("Error ar RegisterController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

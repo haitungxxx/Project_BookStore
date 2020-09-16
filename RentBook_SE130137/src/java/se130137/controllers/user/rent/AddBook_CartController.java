@@ -35,7 +35,7 @@ public class AddBook_CartController extends HttpServlet {
             String title = request.getParameter("txtTitle");
             int quantity = 1;
             Double price = Double.parseDouble(request.getParameter("txtPrice"));
-            String isActive = request.getParameter("txtIsActive");
+            boolean isActive = Boolean.parseBoolean(request.getParameter("txtIsActive"));
                     
             BookDTO book = new BookDTO(id, title, quantity, price, isActive);
             HttpSession session = request.getSession();
@@ -47,7 +47,7 @@ public class AddBook_CartController extends HttpServlet {
             session.setAttribute("CART", cart);
             
             url = SUCCESS;
-            request.setAttribute("message", "Ban da them Book:" + title + " Thanh cong roi nhe!");    
+            request.setAttribute("message", "Add BookTitle:" + title + " Success!");    
         } catch (Exception e) {
             log("Error at AddBook_CartController:" + e.toString());
         } finally{

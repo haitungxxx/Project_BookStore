@@ -37,6 +37,8 @@ public class RemoveBook_CartController extends HttpServlet {
                 cart.delete(id);
                 session.setAttribute("CART", cart);
                 url = SUCCESS;
+                
+                request.setAttribute("message", "Remove BookID: " + id + " from cart Success!");    
             }
         } catch (Exception e) {
             log("Error at RemoveBook_CartController:" + e.toString());

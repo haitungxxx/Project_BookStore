@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import se130137.data.dtos.UserDTO;
 import se130137.data.daos.UserDAO;
+import se130137.utils.UserErrorDTO;
 
 /**
  *
@@ -20,8 +21,10 @@ import se130137.data.daos.UserDAO;
  */
 @WebServlet(name = "Update_UserController", urlPatterns = {"/Update_UserController"})
 public class Update_UserController extends HttpServlet {
+
     private static final String SUCCESS = "Search_UserController";
     private static final String ERROR = "invalid.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -34,22 +37,47 @@ public class Update_UserController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+
         String url = ERROR;
         try {
+            
             String userID = request.getParameter("txtUserID");
             String fullName = request.getParameter("txtFullName");
             String password = request.getParameter("txtPassword");
-            String roleID = request.getParameter("txtRoleID"); 
-            String isActive = request.getParameter("txtIsActive");
-            
-            UserDTO dto = new UserDTO(userID, fullName, password, roleID, isActive);
+            String roleID = request.getParameter("txtRoleID");
+            boolean isActive = Boolean.parseBoolean(request.getParameter("txtIsActive"));
+            boolean check = true;
+
+            UserErrorDTO errorDTO = new UserErrorDTO();
+            if (userID.isEmpty()) {
+                errorDTO.setUserIDError("UserID is not empty");
+                check = false;
+            }
+            if (fullName.isEmpty() || fullName.length() < 2 || fullName.length() > 16) {
+                errorDTO.setFullNameError("2 < FullName < 16");
+                check = false;
+            }
             UserDAO dao = new UserDAO();
-            dao.update(dto);
-            url = SUCCESS;
+
+            if (dao.checkID(userID)) {
+                errorDTO.setUserIDError("User ID already exist");
+                check = false;
+            }
+            
+            if (check) {
+                UserDTO dto = new UserDTO(userID, fullName, password, roleID, isActive);
+                dao.update(dto);
+                url = SUCCESS;
+                
+               request.setAttribute("message", "Update UserID: " + userID + " Success!");
+            } else {
+                request.setAttribute("ERROR", errorDTO);
+            }
+            
+            
         } catch (Exception e) {
             log("Error at Update_UserController:" + e.toString());
-        } finally{
+        } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }

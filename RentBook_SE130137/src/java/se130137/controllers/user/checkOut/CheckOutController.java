@@ -18,6 +18,7 @@ import se130137.data.daos.OrderDAO;
 import se130137.data.dtos.BookDTO;
 import se130137.data.dtos.CartDTO;
 import se130137.data.dtos.OrderDTO;
+import se130137.data.dtos.UserDTO;
 
 /**
  *
@@ -27,7 +28,7 @@ import se130137.data.dtos.OrderDTO;
 public class CheckOutController extends HttpServlet {
 
     private static final String SUCCESS = "Search_BookController";
-    private static final String ERROR = "invalid.jsp";
+    private static final String ERROR = "view.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -38,30 +39,45 @@ public class CheckOutController extends HttpServlet {
             //CartDTO
             HttpSession session = request.getSession();
             CartDTO cart_dto = (CartDTO) session.getAttribute("CART");
+            UserDTO user_dto = (UserDTO) session.getAttribute("LOGIN_USER");
 
-            //OrderDTO
-            //
-            //orderID
-            String orderID = "123";
-            //userID
-            String userID = "user";
-            //total
-            Double total = Double.parseDouble(request.getParameter("txtTotal"));
-            
-            //getDate
-            Calendar cal = Calendar.getInstance();        
-            Date date = new Date(cal.getTimeInMillis());
-            //returnDate
-            cal.add(Calendar.DATE, 14);
-            Date returnDate = new Date(cal.getTimeInMillis());
-            OrderDTO order_dto = new OrderDTO(orderID, userID, total, date, returnDate);
-            
-            
             OrderDAO dao = new OrderDAO();
-            dao.insert(order_dto, cart_dto);
-            session.removeAttribute("CART");
-            url = SUCCESS;
+            //(1)CheckBookQuantity
+            BookDTO book = dao.checkQuantityLeft(cart_dto);
+            if (book.getId() == null) { //if bookID == null than mean there are no bookID fail with quantity
+
+                //OrderDTO 
+                //userID
+                String userID = user_dto.getUserID();
+                //orderID
+                String orderID = userID + dao.getOrderLength(); //This will have a bug
+
+                if (!dao.checkID(orderID)) {
+
+                    //total
+                    Double total = Double.parseDouble(request.getParameter("txtTotal"));
+
+                    //getDate
+                    Calendar cal = Calendar.getInstance();
+                    Date date = new Date(cal.getTimeInMillis());
+                    //returnDate
+                    cal.add(Calendar.DATE, 14);
+                    Date returnDate = new Date(cal.getTimeInMillis());
+                    OrderDTO order_dto = new OrderDTO(orderID, userID, total, date, returnDate);
+
+                    //insert and -quantity from tblBook
+                    dao.insert(order_dto, cart_dto);
+                    
+                    session.removeAttribute("CART");
+                    url = SUCCESS;
+
+                    request.setAttribute("message", "CheckOut Success!");
+                }
+            } else {
+                request.setAttribute("message", "CheckOut Fail!Because BookID: " + book.getId() + ", you must enter Quantity <= " + book.getQuantity());
+            }
         } catch (Exception e) {
+            log("Error ar CheckOutController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

@@ -31,16 +31,17 @@ public class BookDAO {
             if (conn != null) {
                 String sql = "SELECT bookID, title, quantity, price, isActive "
                         + "FROM tblBook "
-                        + "WHERE title like ?"; //if search = "" -> show all list in database
+                        + "WHERE title like ? AND isActive=?"; //if search = "" -> show all list in database
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, "%" + search + "%");
+                stm.setBoolean(2, true);
                 rs = stm.executeQuery();
                 while (rs.next()) {
                     String bookID = rs.getString("bookID");
                     String title = rs.getString("title");
                     int quantity = rs.getInt("quantity");
                     double price = rs.getDouble("price");
-                    String isActive = rs.getString("isActive");
+                    boolean isActive = rs.getBoolean("isActive");
                     list.add(new BookDTO(bookID, title, quantity, price, isActive));
                 }
             }
@@ -60,7 +61,6 @@ public class BookDAO {
     }
     
     public void updateStatus(String bookID) throws SQLException {
-        List<BookDTO> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stm = null;
         try {
@@ -70,7 +70,7 @@ public class BookDAO {
                         + "isActive=?"
                         + " WHERE bookID=?"; //if search = "" -> show all list in database
                 stm = conn.prepareStatement(sql);
-                stm.setString(1, "false");
+                stm.setBoolean(1, false);
                 stm.setString(2, bookID);
                 stm.executeUpdate();
             }
@@ -99,7 +99,7 @@ public class BookDAO {
                 stm.setString(1, dto.getTitle());
                 stm.setInt(2, dto.getQuantity());
                 stm.setDouble(3, dto.getPrice());
-                stm.setString(4, dto.getIsActive());
+                stm.setBoolean(4, dto.isIsActive());
                 stm.setString(5, dto.getId());
                 stm.executeUpdate();
             }
@@ -159,7 +159,7 @@ public class BookDAO {
                 stm.setString(2, dto.getTitle());
                 stm.setInt(3, dto.getQuantity());
                 stm.setDouble(4, dto.getPrice());
-                stm.setString(5, dto.getIsActive());
+                stm.setBoolean(5, dto.isIsActive());
                 stm.executeUpdate();
             }
         } catch (Exception e) {

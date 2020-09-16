@@ -32,6 +32,7 @@ public class LogoutController extends HttpServlet {
                 session.invalidate();
             }
         } catch (Exception e) {
+            log("Error ar LogoutController: " + e.toString());
         }finally{
             response.sendRedirect(url);
         }

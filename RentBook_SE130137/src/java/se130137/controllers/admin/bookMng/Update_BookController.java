@@ -16,6 +16,7 @@ import se130137.data.daos.BookDAO;
 import se130137.data.dtos.UserDTO;
 import se130137.data.daos.UserDAO;
 import se130137.data.dtos.BookDTO;
+import se130137.utils.BookErrorDTO;
 import se130137.utils.MyToys;
 
 /**
@@ -24,8 +25,10 @@ import se130137.utils.MyToys;
  */
 @WebServlet(name = "Update_BookController", urlPatterns = {"/Update_BookController"})
 public class Update_BookController extends HttpServlet {
+
     private static final String SUCCESS = "Search_BookMngController";
-    private static final String ERROR = "invalid.jsp";
+    private static final String ERROR = "updateBook.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -38,23 +41,51 @@ public class Update_BookController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+
         MyToys toys = new MyToys();
         String url = ERROR;
         try {
             String bookID = request.getParameter("txtBookID");
-            String title = request.getParameter("txtTitle"); 
+            String title = request.getParameter("txtTitle");
             int quantity = toys.changeToInteger(request.getParameter("txtQuantity"));
             Double price = toys.changeToDouble(request.getParameter("txtPrice"));
-            String isActive = request.getParameter("txtIsActive");
-            
-            BookDTO dto = new BookDTO(bookID, title, quantity, price, isActive);
+            boolean isActive = Boolean.parseBoolean(request.getParameter("cmbIsActive"));
+
+            boolean check = true;
+
+            BookErrorDTO errorDTO = new BookErrorDTO();
+            if (title.isEmpty() || title.length() < 2 || title.length() > 16) {
+                errorDTO.setTitleError("2 < Title < 16");
+                check = false;
+            }
+            if (price <= 0) {
+                errorDTO.setPriceError("Price must be numbers and must > 0");
+                check = false;
+            }
+            if (quantity <= 0) {
+                errorDTO.setQuantityError("Quantity must be an Integer and must > 0");
+                check = false;
+            }
             BookDAO dao = new BookDAO();
-            dao.update(dto);
-            url = SUCCESS;
+
+            if (dao.checkID(bookID)) {
+                errorDTO.setIdError("Book ID already exist");
+                check = false;
+            }
+
+            if (check) {
+                BookDTO dto = new BookDTO(bookID, title, quantity, price, isActive);
+                dao = new BookDAO();
+                url = SUCCESS;
+
+                request.setAttribute("message", "Update BookID: " + bookID + " Success!");
+            } else {
+                request.setAttribute("ERROR_BOOK", errorDTO);
+            }
+
         } catch (Exception e) {
             log("Error at Update_UserController:" + e.toString());
-        } finally{
+        } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }

@@ -34,6 +34,8 @@ public class UpdateStatus_BookController extends HttpServlet {
             BookDAO dao = new BookDAO();
             dao.updateStatus(bookID);
             url = SUCCESS;
+            
+            request.setAttribute("message", "Update BookID: " + bookID + " Success!");
         } catch (Exception e) {
             log("Error at UpdateStatus_BookController: " + e.toString());
         } finally {

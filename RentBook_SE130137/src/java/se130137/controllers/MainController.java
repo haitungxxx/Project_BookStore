@@ -44,7 +44,7 @@ public class MainController extends HttpServlet {
     private static final String ADD = "AddBook_CartController";
     private static final String VIEW = "view.jsp";
     private static final String REMOVE = "RemoveBook_CartController";
-    private static final String UPDATE_PRICE = "UpdatePriceBook_CartController";
+    private static final String UPDATE_QUANTITY = "UpdateQuantityBook_CartController";
     //checkOut
     private static final String CHECKOUT = "CheckOutController";
 
@@ -125,8 +125,8 @@ public class MainController extends HttpServlet {
                 case "RemoveBook":
                     url = REMOVE;
                     break;
-                case "UpdatePrice":
-                    url = UPDATE_PRICE;
+                case "UpdateQuantity":
+                    url = UPDATE_QUANTITY;
                     break;
                 //checkOut (user)
                 case "CheckOut":

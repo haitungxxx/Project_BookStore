@@ -33,6 +33,8 @@ public class UpdateStatus_UserController extends HttpServlet {
             UserDAO dao = new UserDAO();
             dao.ban(userID);
             url = SUCCESS;
+            
+            request.setAttribute("message", "Update UserID: " + userID + " Success!");
         } catch (Exception e) {
             log("Error at UpdateStatus_UserController: " + e.toString());
         } finally {

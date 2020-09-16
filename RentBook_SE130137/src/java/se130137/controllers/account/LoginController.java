@@ -24,7 +24,7 @@ public class LoginController extends HttpServlet {
 
     private static final String SUCCESS_ADMIN = "admin.jsp";
     private static final String SUCCESS_USER = "Search_BookController";
-    private static final String ERROR = "invalid.jsp";
+    private static final String ERROR = "login.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -47,26 +47,35 @@ public class LoginController extends HttpServlet {
             UserDAO dao = new UserDAO();
             UserDTO user_dto = dao.checkLogin(userID, password);
 
-            if (!user_dto.getFullName().isEmpty()) {
-                if (user_dto.getRoleID().equalsIgnoreCase("admin")) {
-                    url = SUCCESS_ADMIN;
+            HttpSession session = request.getSession();
+            if (user_dto.getFullName() != null) {
+                if (user_dto.isIsActive()) {
+                    switch (user_dto.getRoleID()) {
+                        case "admin":
+                            url = SUCCESS_ADMIN;
+                            break;
+                        case "user":
+                            url = SUCCESS_USER;
+                            break;
+                    }
 
-                    HttpSession session = request.getSession();
                     session.setAttribute("LOGIN_USER", user_dto);
-                }else if (user_dto.getRoleID().equalsIgnoreCase("user")) {
-                    url = SUCCESS_USER;
-                    HttpSession session = request.getSession();
-                    session.setAttribute("LOGIN_USER", user_dto);
+                } else {
+                    session.setAttribute("userID", userID);
+                    session.setAttribute("message", "This account have been banned.");
                 }
+            } else {
+                session.setAttribute("userID", userID);
+                session.setAttribute("message", "Login fail with UserID:" + userID + " and Password: ***");
             }
         } catch (Exception e) {
-            log("Error ar LoginServlet: " + e.toString());
+            log("Error ar LoginController: " + e.toString());
         } finally {
             response.sendRedirect(url);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *

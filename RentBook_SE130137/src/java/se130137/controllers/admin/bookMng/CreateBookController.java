@@ -17,15 +17,16 @@ import se130137.utils.BookErrorDTO;
 
 import se130137.utils.MyToys;
 
-
 /**
  *
  * @author haitu
  */
 @WebServlet(name = "CreateBookController", urlPatterns = {"/CreateBookController"})
 public class CreateBookController extends HttpServlet {
+
     private static final String SUCCESS = "Search_BookMngController";
     private static final String ERROR = "createBook.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -46,8 +47,8 @@ public class CreateBookController extends HttpServlet {
             String title = request.getParameter("txtTitle");
             int quantity = toys.changeToInteger(request.getParameter("txtQuantity"));
             Double price = toys.changeToDouble(request.getParameter("txtPrice"));
-            String isActive = "true";
-            
+            boolean isActive = Boolean.parseBoolean(request.getParameter("cmbIsActive"));
+
             boolean check = true;
 
             BookErrorDTO errorDTO = new BookErrorDTO();
@@ -55,15 +56,15 @@ public class CreateBookController extends HttpServlet {
                 errorDTO.setIdError("BookID is not empty");
                 check = false;
             }
-            if (title.isEmpty() || title.length() < 2 || title.length() > 8) {
-                errorDTO.setTitleError("2 < Title < 8");
+            if (title.isEmpty() || title.length() < 2 || title.length() > 16) {
+                errorDTO.setTitleError("2 < Title < 16");
                 check = false;
             }
-            if (price < 0) {
+            if (price <= 0) {
                 errorDTO.setPriceError("Price must be numbers and must > 0");
                 check = false;
             }
-            if (quantity < 0) {
+            if (quantity <= 0) {
                 errorDTO.setQuantityError("Quantity must be an Integer and must > 0");
                 check = false;
             }
@@ -73,15 +74,18 @@ public class CreateBookController extends HttpServlet {
                 errorDTO.setIdError("Book ID already exist");
                 check = false;
             }
-            
+
             if (check) {
                 BookDTO dto = new BookDTO(bookID, title, quantity, price, isActive);
                 dao.insert(dto);
                 url = SUCCESS;
+
+                request.setAttribute("message", "Create new BookID: " + bookID + "Success!");
             } else {
                 request.setAttribute("ERROR_BOOK", errorDTO);
             }
         } catch (Exception e) {
+            log("Error ar CreateBookController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

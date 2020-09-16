@@ -13,12 +13,12 @@ public class UserDTO {
 
     private String userID;
     private String fullName, password, roleID;
-    private String isActive;
+    private boolean isActive;
 
     public UserDTO() {
     }
 
-    public UserDTO(String userID, String fullName, String password, String roleID, String isActive) {
+    public UserDTO(String userID, String fullName, String password, String roleID, boolean isActive) {
         this.userID = userID;
         this.fullName = fullName;
         this.password = password;
@@ -58,11 +58,13 @@ public class UserDTO {
         this.roleID = roleID;
     }
 
-    public String getIsActive() {
+    public boolean isIsActive() {
         return isActive;
     }
 
-    public void setIsActive(String isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
-    } 
+    }
+
+    
 }

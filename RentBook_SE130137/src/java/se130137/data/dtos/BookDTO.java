@@ -14,12 +14,12 @@ public class BookDTO {
     private String title;
     private int quantity;
     private double price;
-    private String isActive;
+    private boolean isActive;
 
     public BookDTO() {
     }
 
-    public BookDTO(String id, String title, int quantity, double price, String isActive) {
+    public BookDTO(String id, String title, int quantity, double price, boolean isActive) {
         this.id = id;
         this.title = title;
         this.quantity = quantity;
@@ -59,11 +59,11 @@ public class BookDTO {
         this.price = price;
     }
 
-    public String getIsActive() {
+    public boolean isIsActive() {
         return isActive;
     }
 
-    public void setIsActive(String isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
